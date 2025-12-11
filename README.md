@@ -29,7 +29,7 @@ This project demonstrates a backend system that can define a sequence of steps (
 ## Project Structure
 
 ```text
-ai-intern-assignment/
+Tredence-Assignment/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py        # FastAPI entry point & API routes
@@ -49,7 +49,7 @@ ai-intern-assignment/
 1.  **Clone the repository**
 
     ```bash
-    git clone https://github.com/Kumayl-Lokhandwala/tredence-assignment.git
+    git clone https://github.com/sdiv0503/Tredence-Assignment.git
     cd tredence-assignment
     ```
 
