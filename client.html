@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AI Workflow Tester (WebSocket)</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        background-color: #f9f9f9;
+        color: #333;
+      }
+
+      /* Input Section Styling */
+      .config-section {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .config-row {
+        margin-bottom: 15px;
+      }
+      .config-row label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+      }
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+      textarea {
+        height: 80px;
+        resize: vertical;
+      }
+
+      /* Log Box Styling */
+      .log-box {
+        background: #1e1e1e;
+        color: #00e676;
+        padding: 20px;
+        border-radius: 8px;
+        height: 400px;
+        overflow-y: scroll;
+        font-family: "Consolas", "Monaco", monospace;
+        white-space: pre-wrap;
+        font-size: 13px;
+        border: 1px solid #333;
+      }
+
+      /* Button Styling */
+      button {
+        background: #6200ea;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+      }
+      button:hover {
+        background: #3700b3;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>⚡ Real-Time Workflow Stream</h1>
+
+    <div class="config-section">
+      <div class="config-row">
+        <label for="graphInput">Graph ID</label>
+        <input
+          type="text"
+          id="graphInput"
+          placeholder="e.g., demo-summary or UUID"
+        />
+      </div>
+      <div class="config-row">
+        <label for="textInput">Input Text</label>
+        <textarea
+          id="textInput"
+          placeholder="Enter text to process..."
+        ></textarea>
+      </div>
+      <button id="runBtn" onclick="runWebSocket()">Start Streaming</button>
+    </div>
+
+    <h3>Live Logs</h3>
+    <div class="log-box" id="ws-logs">Ready to connect...</div>
+
+    <script>
+      function runWebSocket() {
+        const graphId = document.getElementById("graphInput").value.trim();
+        const textData = document.getElementById("textInput").value.trim();
+        const logBox = document.getElementById("ws-logs");
+        const btn = document.getElementById("runBtn");
+
+        if (!graphId) {
+          alert("Please enter a Graph ID");
+          return;
+        }
+
+        // Reset UI
+        logBox.textContent = `Connecting to Graph ID: ${graphId}...\n`;
+        btn.disabled = true;
+        btn.textContent = "Running...";
+
+        // Create Payload
+        const payload = {
+          graph_id: graphId,
+          initial_state: {
+            text: textData,
+          },
+        };
+
+        // Connect
+        const ws = new WebSocket("ws://127.0.0.1:8000/ws/run");
+
+        ws.onopen = () => {
+          logBox.textContent +=
+            "✔ Connection Open. Sending Payload...\n-----------------------------------\n";
+          ws.send(JSON.stringify(payload));
+        };
+
+        ws.onmessage = (event) => {
+          // Formatting the log
+          logBox.textContent += `${event.data}\n`;
+          // Auto-scroll to bottom
+          logBox.scrollTop = logBox.scrollHeight;
+        };
+
+        ws.onclose = () => {
+          logBox.textContent +=
+            "\n-----------------------------------\n[Connection Closed]";
+          btn.disabled = false;
+          btn.textContent = "Start Streaming";
+        };
+
+        ws.onerror = (error) => {
+          logBox.textContent += `\nError: ${error}`;
+          btn.disabled = false;
+          btn.textContent = "Start Streaming";
+        };
+      }
+    </script>
+  </body>
+</html>

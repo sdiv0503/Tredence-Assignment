@@ -1,0 +1,23 @@
+# Python compilation files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.venv/
+.env
+
+# Distribution / Packaging
+build/
+dist/
+*.egg-info/
+
+# IDE Settings (VS Code / PyCharm)
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
